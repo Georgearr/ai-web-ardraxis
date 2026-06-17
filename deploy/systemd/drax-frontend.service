@@ -1,0 +1,16 @@
+[Unit]
+Description=DRAX Frontend — Next.js
+After=network.target
+
+[Service]
+Type=exec
+User=www-data
+WorkingDirectory=/var/www/draxis/frontend
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=NEXT_PUBLIC_API_URL=https://draxis.osissmaigs.com/api/v1
+
+[Install]
+WantedBy=multi-user.target
