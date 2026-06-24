@@ -35,7 +35,7 @@ export function ChatInterface() {
             {isStreaming && <LoadingIndicator />}
             {error && (
               <div className="px-4 pb-4">
-                <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <div className="rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm text-red-400 backdrop-blur-[6px]">
                   {error}
                 </div>
               </div>

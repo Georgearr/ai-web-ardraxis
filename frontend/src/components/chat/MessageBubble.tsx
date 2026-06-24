@@ -20,22 +20,26 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     >
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          isUser ? "bg-primary" : "bg-muted"
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[rgba(255,255,255,0.12)] backdrop-blur-[6px]",
+          isUser
+            ? "bg-gradient-to-br from-[#1d696e] to-[#2d8f9a]"
+            : "bg-[rgba(0,0,0,0.25)]"
         )}
       >
-        <Icon
-          name={isUser ? "user" : "bot"}
-          className={isUser ? "text-primary-foreground" : "text-foreground"}
-          size={16}
-        />
+        {isUser ? (
+          <Icon name="user" className="text-white" size={16} />
+        ) : (
+          <span className="text-sm font-black text-transparent bg-gradient-to-br from-white to-[#b2dfdb] bg-clip-text">
+            D
+          </span>
+        )}
       </div>
       <div
         className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+          "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-[0_10px_30px_rgba(0,0,0,0.3)]",
           isUser
-            ? "bg-primary text-primary-foreground rounded-tr-md"
-            : "bg-muted text-foreground rounded-tl-md"
+            ? "bg-gradient-to-br from-[#1d696e] to-[#2d8f9a] text-white rounded-tr-md"
+            : "glass-card text-white/90 rounded-tl-md"
         )}
       >
         <p className="whitespace-pre-wrap">{message.content}</p>

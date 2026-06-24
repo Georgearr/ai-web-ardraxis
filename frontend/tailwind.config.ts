@@ -47,14 +47,29 @@ const config: Config = {
           DEFAULT: "hsl(var(--sidebar))",
           foreground: "hsl(var(--sidebar-foreground))",
         },
+        ardraxis: {
+          teal: "#1d696e",
+          "teal-dark": "#0e3a42",
+          "teal-light": "#5197a3",
+          "teal-bright": "#96cccd",
+          mist: "#b2dfdb",
+          "mist-light": "#d6f3ef",
+          "dark-start": "#0f2027",
+          "dark-mid": "#203a43",
+          "dark-end": "#2c5364",
+          "glass-bg": "rgba(0,0,0,0.25)",
+          "glass-border": "rgba(255,255,255,0.12)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "2xl": "16px",
+        "3xl": "18px",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "Arial", "sans-serif"],
       },
       keyframes: {
         "fade-in": {
@@ -69,11 +84,21 @@ const config: Config = {
           "0%, 100%": { opacity: "0.4" },
           "50%": { opacity: "1" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        "text-glow": {
+          from: { filter: "drop-shadow(0 0 10px rgba(178,223,219,0.5))" },
+          to: { filter: "drop-shadow(0 0 20px rgba(178,223,219,0.8))" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.3s ease-out",
         "slide-up": "slide-up 0.4s ease-out",
         "pulse-dot": "pulse-dot 1.4s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
+        "text-glow": "text-glow 3s ease-in-out infinite alternate",
       },
     },
   },
