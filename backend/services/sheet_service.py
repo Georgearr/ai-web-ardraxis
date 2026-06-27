@@ -3,7 +3,9 @@ from google.oauth2.service_account import Credentials
 from config import Config
 from models.member import Member
 from models.event import Event
+from config import Config
 from services.cache_manager import cache_manager
+from services.mock_service import get_mock_events, get_mock_members
 from utils.logger import logger
 
 
@@ -113,6 +115,9 @@ def refresh_data():
 
 
 def get_members() -> list[Member]:
+    if Config.use_mock_data():
+        return get_mock_members()
+
     cached = cache_manager.get("members")
     if cached is not None:
         return cached
@@ -121,6 +126,9 @@ def get_members() -> list[Member]:
 
 
 def get_events() -> list[Event]:
+    if Config.use_mock_data():
+        return get_mock_events()
+
     cached = cache_manager.get("events")
     if cached is not None:
         return cached

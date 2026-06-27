@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import Flask
 from config import Config
 from utils.logger import logger
@@ -7,9 +9,15 @@ from blueprints.health import health_bp
 from blueprints.chat import chat_bp
 from blueprints.suggestions import suggestions_bp
 
+BACKEND_DIR = Path(__file__).resolve().parent
+
 
 def create_app() -> Flask:
-    app = Flask(__name__)
+    app = Flask(
+        "drax",
+        root_path=str(BACKEND_DIR),
+        instance_path=str(BACKEND_DIR / "instance"),
+    )
     app.config.from_object(Config)
     app.config["SECRET_KEY"] = Config.SECRET_KEY
 
@@ -41,4 +49,4 @@ app = create_app()
 
 if __name__ == "__main__":
     Config.validate()
-    app.run(host="0.0.0.0", port=5000, debug=Config.FLASK_DEBUG)
+    app.run(host="0.0.0.0", port=Config.PORT, debug=Config.FLASK_DEBUG)

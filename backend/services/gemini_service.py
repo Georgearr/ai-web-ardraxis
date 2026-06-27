@@ -1,9 +1,11 @@
 import google.generativeai as genai
+from pathlib import Path
+
 from config import Config
 from utils.logger import logger
 
-
-SYSTEM_PROMPT_PATH = "system_prompt.txt"
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+SYSTEM_PROMPT_PATH = BACKEND_DIR / "system_prompt.txt"
 
 
 def _load_system_prompt() -> str:

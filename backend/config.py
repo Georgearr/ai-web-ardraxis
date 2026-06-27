@@ -8,6 +8,8 @@ load_dotenv()
 class Config:
     FLASK_ENV = os.getenv("FLASK_ENV", "production")
     FLASK_DEBUG = os.getenv("FLASK_DEBUG", "0") == "1"
+    DEV_MODE = os.getenv("DEV_MODE", "0") == "1"
+    PORT = int(os.getenv("PORT", "5001"))
     SECRET_KEY = os.getenv("SECRET_KEY", "default-dev-key")
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
     GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID", "")
@@ -20,7 +22,23 @@ class Config:
     SHEET_EVENTS_RANGE = "Events!A:F"
 
     @classmethod
+    def use_mock_data(cls) -> bool:
+        if cls.DEV_MODE:
+            return True
+        return (
+            not cls.GOOGLE_SHEET_ID
+            or cls.GOOGLE_SERVICE_ACCOUNT_JSON == "{}"
+        )
+
+    @classmethod
+    def use_mock_ai(cls) -> bool:
+        return cls.DEV_MODE and not cls.GEMINI_API_KEY
+
+    @classmethod
     def validate(cls):
+        if cls.DEV_MODE:
+            return
+
         errors = []
         if not cls.GEMINI_API_KEY:
             errors.append("GEMINI_API_KEY is not set")
