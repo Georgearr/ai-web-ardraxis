@@ -14,6 +14,9 @@ class Config:
     AI_PROVIDER = os.getenv("AI_PROVIDER", "deepseek")
     AI_FALLBACK_ENABLED = os.getenv("AI_FALLBACK_ENABLED", "true").lower() == "true"
     AI_FALLBACK_ORDER = os.getenv("AI_FALLBACK_ORDER", "deepseek,openrouter,openai,gemini")
+    AI_MAX_TOKENS = int(os.getenv("AI_MAX_TOKENS", "512"))
+    AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "0.3"))
+    AI_TOP_P = float(os.getenv("AI_TOP_P", "0.9"))
 
     DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
     DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")

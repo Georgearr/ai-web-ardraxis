@@ -1,5 +1,6 @@
 from config import Config
-from .base_provider import BaseProvider
+from utils.logger import logger
+from .base_provider import BaseProvider, ProviderError
 
 
 class OpenRouterProvider(BaseProvider):
@@ -30,9 +31,9 @@ class OpenRouterProvider(BaseProvider):
         return {
             "model": self._get_model(),
             "messages": messages,
-            "temperature": 0.3,
-            "top_p": 0.9,
-            "max_tokens": 1024,
+            "temperature": self.temperature,
+            "top_p": self.top_p,
+            "max_tokens": self.max_tokens,
         }
 
     def _parse_response(self, data: dict) -> str:
@@ -40,3 +41,19 @@ class OpenRouterProvider(BaseProvider):
         if not choices:
             return ""
         return choices[0].get("message", {}).get("content", "").strip()
+
+    def ask(self, user_message: str, context: str) -> str:
+        self._max_tokens_override = None
+
+        for attempt in range(2):
+            try:
+                return super().ask(user_message, context)
+            except ProviderError as e:
+                has_credit_error = (
+                    "requires more credits" in (e.reason or "").lower()
+                )
+                if attempt == 0 and has_credit_error and Config.AI_MAX_TOKENS > 256:
+                    logger.info("Retrying OpenRouter with max_tokens=256...")
+                    self._max_tokens_override = 256
+                    continue
+                raise

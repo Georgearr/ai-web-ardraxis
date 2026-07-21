@@ -55,12 +55,14 @@ class CsvDataStore:
         members = []
         for row in rows:
             try:
+                sub_sekbid_raw = row.get("Sub-sekbid") or row.get("sub_sekbid") or ""
                 member = Member(
                     id=row.get("id", ""),
                     nama_panggilan=row.get("nama_panggilan", ""),
                     nama_lengkap=row.get("nama_lengkap", ""),
                     jabatan=row.get("jabatan", ""),
                     sekbid=row.get("sekbid", ""),
+                    sub_sekbid=_empty_to_none(sub_sekbid_raw),
                     instagram=_empty_to_none(row.get("instagram", "")),
                     deskripsi=_empty_to_none(row.get("deskripsi", "")),
                 )
@@ -82,9 +84,11 @@ class CsvDataStore:
                     id=row.get("id", ""),
                     nama_event=row.get("nama_event", ""),
                     tanggal=row.get("tanggal", ""),
-                    lokasi=row.get("lokasi", ""),
-                    instagram=_empty_to_none(row.get("instagram", "")),
-                    deskripsi=_empty_to_none(row.get("deskripsi", "")),
+                    ketua_pelaksana=_empty_to_none(row.get("ketua_pelaksana", "")),
+                    wakil_ketua_pelaksana_1=_empty_to_none(row.get("wakil_ketua_pelaksana_1", "")),
+                    wakil_ketua_pelaksana_2=_empty_to_none(row.get("wakil_ketua_pelaksana_2", "")),
+                    koordinator_acara=_empty_to_none(row.get("koordinator_acara", "")),
+                    koordinator_keamanan=_empty_to_none(row.get("koordinator_keamanan", "")),
                 )
                 if event.nama_event:
                     events.append(event)

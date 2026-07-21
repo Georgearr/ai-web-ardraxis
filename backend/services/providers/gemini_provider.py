@@ -36,9 +36,9 @@ class GeminiProvider(BaseProvider):
         return {
             "contents": gemini_contents,
             "generationConfig": {
-                "temperature": 0.3,
-                "topP": 0.9,
-                "maxOutputTokens": 1024,
+                "temperature": self.temperature,
+                "topP": self.top_p,
+                "maxOutputTokens": self.max_tokens,
             },
         }
 

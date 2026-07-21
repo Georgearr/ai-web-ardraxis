@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useChat } from "@/hooks/useChat"
 import { getSuggestions } from "@/services/api-client"
 import { EmptyState } from "./EmptyState"
@@ -11,6 +11,7 @@ import { LoadingIndicator } from "./LoadingIndicator"
 export function ChatInterface() {
   const { messages, isStreaming, error, send } = useChat()
   const [suggestions, setSuggestions] = useState<string[]>([])
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     getSuggestions()
@@ -28,10 +29,10 @@ export function ChatInterface() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-y-auto scrollbar-thin">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-thin">
         {hasMessages ? (
           <>
-            <MessageList messages={messages} />
+            <MessageList messages={messages} scrollRef={scrollRef} />
             {isStreaming && <LoadingIndicator />}
             {error && (
               <div className="px-4 pb-4">

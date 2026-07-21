@@ -28,9 +28,9 @@ class OpenAIProvider(BaseProvider):
         return {
             "model": self._get_model(),
             "messages": messages,
-            "temperature": 0.3,
-            "top_p": 0.9,
-            "max_tokens": 1024,
+            "temperature": self.temperature,
+            "top_p": self.top_p,
+            "max_tokens": self.max_tokens,
         }
 
     def _parse_response(self, data: dict) -> str:

@@ -163,6 +163,18 @@ def _process_event_search(
     event_models: list[Event],
     **_kwargs,
 ) -> dict[str, Any]:
+    msg = message.lower()
+    scored: list[tuple[int, Event]] = []
+    for e in event_models:
+        if e.nama_event:
+            name_lower = e.nama_event.lower()
+            name_tokens = name_lower.split()
+            matching_tokens = sum(1 for t in name_tokens if t in msg and len(t) > 2)
+            if matching_tokens > 0:
+                scored.append((matching_tokens, e))
+    if scored:
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return {"matched": [e for _, e in scored]}
     return {"matched": event_models}
 
 
@@ -205,8 +217,7 @@ def _process_member_search(
 
     if scored:
         scored.sort(key=lambda x: x[0], reverse=True)
-        best = scored[0]
-        return {"matched": [best[1]], "match_type": best[2]}
+        return {"matched": [m for _, m, _ in scored], "match_type": scored[0][2]}
 
     return {"matched": []}
 
@@ -254,10 +265,15 @@ def process_intent(
 # ---------------------------------------------------------------------------
 
 def _short_member_lines(m: Member) -> str:
-    line = f"- {m.nama_lengkap} ({m.nama_panggilan}) - {m.jabatan} - {m.sekbid}"
+    emoji = m.position_emoji()
+    position = m.position_display()
+    line = f"- {m.nama_lengkap} ({m.nama_panggilan}) - {position}"
     extras = []
     if m.instagram:
-        extras.append(f"  Instagram: @{m.instagram}")
+        insta_line = f"  Instagram: @{m.instagram}"
+        if emoji:
+            insta_line += f" {emoji}"
+        extras.append(insta_line)
     if m.deskripsi:
         extras.append(f"  Deskripsi: {m.deskripsi}")
     if extras:
@@ -316,11 +332,17 @@ def build_intent_context(result: dict[str, Any]) -> str:
         if matched:
             parts.append("=== DATA EVENT ===")
             for e in matched:
-                line = f"- {e.nama_event} | {e.tanggal} | {e.lokasi}"
-                if e.instagram:
-                    line += f"\n  Instagram: @{e.instagram}"
-                if e.deskripsi:
-                    line += f"\n  Deskripsi: {e.deskripsi}"
+                line = f"- {e.nama_event} | {e.tanggal}"
+                fields = [
+                    ("Ketua Pelaksana", e.ketua_pelaksana),
+                    ("Wakil Ketua Pelaksana 1", e.wakil_ketua_pelaksana_1),
+                    ("Wakil Ketua Pelaksana 2", e.wakil_ketua_pelaksana_2),
+                    ("Koordinator Acara", e.koordinator_acara),
+                    ("Koordinator Keamanan", e.koordinator_keamanan),
+                ]
+                for label, value in fields:
+                    if value:
+                        line += f"\n  {label}: {value}"
                 parts.append(line)
         else:
             parts.append("(Tidak ada event tercatat)")

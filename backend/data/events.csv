@@ -1,5 +1,13 @@
-id,nama_event,tanggal,lokasi,instagram,deskripsi
-1,OSIS Expo 2026,15 Maret 2026,Aula SMA Ignatius Global School,osis.smaigs,Pameran program kerja dan pendaftaran ekstrakurikuler OSIS.
-2,Charity Concert ARDRAXIS,20 April 2026,Gedung Serbaguna SMAIGS,ardraxis.event,Konser amal untuk mendukung program sosial kabinet ARDRAXIS.
-3,LDKS ARDRAXIS,10 Januari 2026,Bumi Perkemahan Sematang Borang,osis.smaigs,Latihan Dasar Kepemimpinan Siswa untuk anggota OSIS baru.
-4,Bakti Sosial ARDRAXIS,5 Februari 2026,Panti Asuhan Palembang,ardraxis.sosial,Kegiatan bakti sosial dan penggalangan dana.
+id,nama_event,tanggal,ketua_pelaksana,wakil_ketua_pelaksana_1,wakil_ketua_pelaksana_2,koordinator_acara,koordinator_keamanan
+1,Meloria,14/11/2025,Livia Atriana Taufiek,Jacqueline ,,Viena Yang,M. Chava Putra Anugra
+2,Ajakarsa,25/11/2025,Kayla Visha Arganata,Salwa Putri Athaira,,Khairunnisa Lubna,Marcelo William Tobing 
+3,Festiora,02/12/2025,Siti Naila Zhafirah,Rihanna Maheswari Sastradiredja,,Amirah Mirza Hanania,Andrew Nickson 
+4,Concendant,09-10/12/2025,Mahasin Qutbi,Nanda Syahnila Mufidah,,Fadli Said Ramadhan,Revaline Tan Aurellia 
+5,Sacrelume,12/12/2025,Jessica Duangmun,Sydney Venecia,,Ruth Levana,Nabila Putri Awaliyah
+6,Yuera ,18/02/2026,Licia Emiliandra,Evelly Lynn Hyori Kho,Graciella Naomi Lee,Treesha,Revaline Tan Aurellia 
+7,Atthaira,06/03/2026,Muhammad Daffa Aqeela Shidqi,Kayyisah Putri Khairani,Alifia Mazaya,Luthfiyah Khairunnisa,Revaline Tan Aurellia 
+8,Salvatore,17/04/2026,Michaela Nathania,Benedicta Andinica Keiko,,Marcello Deven Husada ,Livia Attriana Taufiek 
+9,Evoriante,15/05/2026,Krisensia Early Renata,Aveline Calista Zora Adriansyah ,Cherine Chiandiary,Devina Aurelia Theng S. ,Revaline Tan Aurellia 
+10,Bodhivara,29/05/2026,Revaline Tan Aurellia,Kharyn Vanesta Husnafsky ,,Alexandro Risamanto,M. Chava Putra Anugra
+11,Ravenith,04/06/2026,Celeste Wisman,Sydney Gracelyn Wang,Rainazia Mikaila Dopong,Tifanie Elvaretta ,Revaline Tan Aurellia 
+12,Odyssey,01-07/07/2026,Nabila Putri Awaliyah,,,,

@@ -3,17 +3,24 @@
 import { useEffect, useRef } from "react"
 import { MessageBubble } from "./MessageBubble"
 import type { Message } from "@/types/chat"
+import type { RefObject } from "react"
 
 interface MessageListProps {
   messages: Message[]
+  scrollRef: RefObject<HTMLDivElement | null>
 }
 
-export function MessageList({ messages }: MessageListProps) {
+export function MessageList({ messages, scrollRef }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollTo({
+      top: el.scrollHeight,
+      behavior: "smooth",
+    })
+  }, [messages, scrollRef])
 
   if (messages.length === 0) return null
 

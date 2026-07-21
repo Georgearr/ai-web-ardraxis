@@ -7,6 +7,7 @@ The build_context() function is still used and maintained here.
 from pathlib import Path
 
 from utils.logger import logger
+from models.member import format_position, position_emoji
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 SYSTEM_PROMPT_PATH = BACKEND_DIR / "prompts" / "system_prompt.txt"
@@ -48,12 +49,23 @@ def build_context(
                 f"(Menampilkan anggota dari: {', '.join(matched_sekbids)})"
             )
             for m in filtered:
+                pos = format_position(
+                    m.get("jabatan", ""),
+                    m.get("sekbid", ""),
+                    m.get("sub_sekbid"),
+                )
+                emoji = position_emoji(
+                    m.get("sekbid", ""),
+                    m.get("sub_sekbid"),
+                )
                 context_parts.append(
-                    f"- {m.get('nama_lengkap')} ({m.get('nama_panggilan')}) - "
-                    f"{m.get('jabatan')} - {m.get('sekbid')}"
+                    f"- {m.get('nama_lengkap')} ({m.get('nama_panggilan')}) - {pos}"
                 )
                 if m.get("instagram"):
-                    context_parts.append(f"  Instagram: @{m.get('instagram')}")
+                    insta_line = f"  Instagram: @{m.get('instagram')}"
+                    if emoji:
+                        insta_line += f" {emoji}"
+                    context_parts.append(insta_line)
                 if m.get("deskripsi"):
                     context_parts.append(f"  Deskripsi: {m.get('deskripsi')}")
         else:
@@ -62,12 +74,23 @@ def build_context(
             )
     else:
         for m in members_data:
+            pos = format_position(
+                m.get("jabatan", ""),
+                m.get("sekbid", ""),
+                m.get("sub_sekbid"),
+            )
+            emoji = position_emoji(
+                m.get("sekbid", ""),
+                m.get("sub_sekbid"),
+            )
             context_parts.append(
-                f"- {m.get('nama_lengkap')} ({m.get('nama_panggilan')}) - "
-                f"{m.get('jabatan')} - {m.get('sekbid')}"
+                f"- {m.get('nama_lengkap')} ({m.get('nama_panggilan')}) - {pos}"
             )
             if m.get("instagram"):
-                context_parts.append(f"  Instagram: @{m.get('instagram')}")
+                insta_line = f"  Instagram: @{m.get('instagram')}"
+                if emoji:
+                    insta_line += f" {emoji}"
+                context_parts.append(insta_line)
             if m.get("deskripsi"):
                 context_parts.append(f"  Deskripsi: {m.get('deskripsi')}")
 
@@ -75,13 +98,18 @@ def build_context(
     context_parts.append("=== DATA EVENT ===")
     if events_data:
         for e in events_data:
-            context_parts.append(
-                f"- {e.get('nama_event')} | {e.get('tanggal')} | {e.get('lokasi')}"
-            )
-            if e.get("instagram"):
-                context_parts.append(f"  Instagram: @{e.get('instagram')}")
-            if e.get("deskripsi"):
-                context_parts.append(f"  Deskripsi: {e.get('deskripsi')}")
+            line = f"- {e.get('nama_event')} | {e.get('tanggal')}"
+            for label, key in [
+                ("Ketua Pelaksana", "ketua_pelaksana"),
+                ("Wakil Ketua Pelaksana 1", "wakil_ketua_pelaksana_1"),
+                ("Wakil Ketua Pelaksana 2", "wakil_ketua_pelaksana_2"),
+                ("Koordinator Acara", "koordinator_acara"),
+                ("Koordinator Keamanan", "koordinator_keamanan"),
+            ]:
+                val = e.get(key)
+                if val:
+                    line += f"\n  {label}: {val}"
+            context_parts.append(line)
     else:
         context_parts.append("(Tidak ada event tercatat)")
 

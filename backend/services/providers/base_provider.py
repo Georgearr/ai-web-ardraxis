@@ -21,6 +21,7 @@ class ProviderError(Exception):
 
 class BaseProvider(ABC):
     TIMEOUT = 60
+    _max_tokens_override: int | None = None
 
     @property
     @abstractmethod
@@ -52,6 +53,20 @@ class BaseProvider(ABC):
     @abstractmethod
     def _parse_response(self, data: dict) -> str:
         pass
+
+    @property
+    def max_tokens(self) -> int:
+        if self._max_tokens_override is not None:
+            return self._max_tokens_override
+        return Config.AI_MAX_TOKENS
+
+    @property
+    def temperature(self) -> float:
+        return Config.AI_TEMPERATURE
+
+    @property
+    def top_p(self) -> float:
+        return Config.AI_TOP_P
 
     def _get_model(self) -> str:
         return self.default_model
@@ -94,6 +109,9 @@ class BaseProvider(ABC):
         logger.info("=" * 60)
         logger.info("Trying Provider:   %s", self.provider_name)
         logger.info("Model:             %s", model)
+        logger.info("Temperature:       %s", self.temperature)
+        logger.info("Top P:             %s", self.top_p)
+        logger.info("Max Tokens:        %s", self.max_tokens)
         logger.info("Request at:        %s", timestamp)
 
         try:
