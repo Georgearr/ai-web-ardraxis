@@ -1,11 +1,99 @@
-id,nama_panggilan,nama_lengkap,jabatan,sekbid,instagram,deskripsi
-1,George,George Alexander,Ketua OSIS,Top Management,osis.smaigs,Memimpin kabinet ARDRAXIS periode 2025/2026.
-2,Justin,Justin Michael,Wakil Ketua OSIS 1,Top Management,osis.smaigs,Bertanggung jawab atas koordinasi internal OSIS.
-3,Chris,Christopher Lee,Koordinator,Multimedia Website,ardraxis.web,Mengurus website dan sistem digital ARDRAXIS.
-4,Sarah,Sarah Wijaya,Koordinator,Humas dan Publikasi,ardraxis.humas,Mengelola media sosial dan publikasi resmi OSIS.
-5,Michael,Michael Anderson,Wakil Ketua OSIS 2,Top Management,osis.smaigs,Membantu koordinasi kegiatan dan program kerja OSIS.
-6,Natasha,Natasha Gunawan,Sekretaris,Top Management,osis.smaigs,Mengelola administrasi dan dokumentasi kabinet ARDRAXIS.
-7,Lukas,Lukas Pratama,Bendahara,Top Management,osis.smaigs,Mengelola keuangan dan anggaran OSIS.
-8,Raya,Raya Indah Permata,Koordinator,Multimedia Onfield,ardraxis.onfield,Mengurus perlengkapan teknis dan peralatan acara.
-9,Dimas,Dimas Ardiansyah,Koordinator,Design,ardraxis.design,Mendesain materi visual dan branding resmi ARDRAXIS.
-10,Karina,Karina Putri,Koordinator,Dokumentasi,ardraxis.doc,Mendokumentasikan setiap kegiatan OSIS secara visual.
+id,nama_panggilan,nama_lengkap,jabatan,sekbid,Sub-sekbid,instagram
+1,jesmun/jezzd,Jessica Duangmun,Ketua OSIS,Inti OSIS,,jemoonn
+2,"astro, karak, rakhaa",Rakha Aqila Astro,Wakil Ketua OSIS I,Inti OSIS,,@rakhaaqilaastroo
+3,sydney/ney,Sydney Venecia,Wakil Ketua OSIS II,Inti OSIS,,sydney.venecia
+90,Lici/cia/Cece sekree,Licia Emiliandra ,Sekretaris ,Inti OSIS,,licia_zhu09
+37,keiko/es kiko/kekok tokek,Benedicta Andinica Keiko,Wakil Sekretaris,Inti OSIS,,keiko.benedicta
+4,kela/ayak/kayie,Kayla Visha Arganata,Bendahara,Inti OSIS,,kaylaavsh
+84,Feli/Wakil Bendahara,Felicia Theng,Wakil Bendahara,Inti OSIS,,felistillrunning
+23,laxmi/putu/mimi,Laxmi Dewi Putu Ardana,Koordinator,"Kepribadian, Wawasan Kebangsaan, dan Bela Negara",,laxmi.ardana
+77,lyn/velyn,Velyn Calista Syakirah,Anggota,"Kepribadian, Wawasan Kebangsaan, dan Bela Negara",,velyn.cs
+42,Naura/naura yang “itu”/naura yang mana?,Naura Syifa Mazzayah,Anggota,"Kepribadian, Wawasan Kebangsaan, dan Bela Negara",,naurasyifam
+27,fadli/padil/dil,Fadli Said Ramadhan,Anggota,"Kepribadian, Wawasan Kebangsaan, dan Bela Negara",,fdli_srn
+21,lulubnana,Khairunnisa Lubna,Anggota,"Kepribadian, Wawasan Kebangsaan, dan Bela Negara",,khairnnslbn
+36,Jasmine Ayyashi/min/jasmin aladdin,Luh Made Jasmine Ayyashi,Anggota,"Kepribadian, Wawasan Kebangsaan, dan Bela Negara",,aysiizxcv_
+28,Salwow Hacker Belanda,Salwa Putri Athirah,Anggota,"Kepribadian, Wawasan Kebangsaan, dan Bela Negara",,slwaaptr21
+36,jasmine ayyashi/ jasmin aladdin/min,Luh Made Jasmine Ayyashi,Anggota,"Kepribadian, Wawasan Kebangsaan, dan Bela Negara",,aysiizxcv_
+96,Richiro/chiro,Richiro Huang,Koordinator,Multimedia,On-Field,richiro_huang
+17,Kepin/sultan palembang/pirang,Kevin Hendrawan,Anggota,Multimedia,On-Field,kvn_hndrwnn
+86,recel/acel,Rachel Callista Zerlind,Anggota,Multimedia,On-Field,_raechelcz
+69,George,George Arrev Turnip,Koordinator,Multimedia,Website,george_arrev_turnip
+,Nathan,Mazkenzoe Nathan Huang,Anggota,Multimedia,Website,nathanhuang12
+56,handoyo,Handoyo,Anggota,Multimedia,Website,fakecomew
+94,ibet/codeforces victim,Filbert Willy,Anggota,Multimedia,Website,filbertwilly
+11,kirana,Ahmatania Daneendra Shasikirana,Koordinator,Hubungan Masyarakat dan Publikasi,,taniadndra
+81,Aireen/Aiwin/Yiyin,Jevonne Aireen Jaufarry,Anggota,Hubungan Masyarakat dan Publikasi,,aireenzz_kkk
+15,keyyy,khaeirin alya A.G.,Anggota,Hubungan Masyarakat dan Publikasi,,@khrin.aag
+87,Nomii/Nanaoo,Graciella Naomi Lee,Anggota,Hubungan Masyarakat dan Publikasi,,nao_milee
+78,"Nathasya, Nat",Nathasya Averill Chandra,Anggota,Hubungan Masyarakat dan Publikasi,,nathvrll
+35,"ney, iney, neyen",Neyra Azalia Titian,Anggota,Hubungan Masyarakat dan Publikasi,,neyraazalia_
+34,klarens / klapibara ,Klarensa Sastra Gennar,Anggota,Hubungan Masyarakat dan Publikasi,,klareansa
+7,Nailaa / Anai / jgnpanggil siti pls,Siti Naila Zhafirah,Koordinator Sub-sekbid,"Desain, Dokumentasi, dan Visual",Desain,aannaaii_
+18,tomat,Celeste Wisman,Anggota,"Desain, Dokumentasi, dan Visual",Desain,lecii.cel
+39,Jocelyn/Kalisa/Jojo Theng,Jocelyn Kalisa Theng,Anggota,"Desain, Dokumentasi, dan Visual",Desain,kalisa_jt
+13,Zia,Rainazia Mikaila Dopong,Anggota,"Desain, Dokumentasi, dan Visual",Desain,m.kaell4_
+98,pati pemalaz,Fathi Dhiya Zhafar,Anggota,"Desain, Dokumentasi, dan Visual",Desain,fathi.dzr
+60,Kayy / Kayyisah ,Kayyisah Putri Khairani,Koordinator Sub-sekbid,"Desain, Dokumentasi, dan Visual",Dokumentasi,ky.khair
+54,mik/don buri/mika pencinta kodok,Mika Renatta Indrawan,Anggota,"Desain, Dokumentasi, dan Visual",Dokumentasi,mikarntta
+6,eve/ipi,Evelly Lynn Hyori Kho,Anggota,"Desain, Dokumentasi, dan Visual",Dokumentasi,evehyori_
+62,chiril,Philomena Glovia Cheryl Purba,Anggota,"Desain, Dokumentasi, dan Visual",Dokumentasi,philomn.cheryl
+63,princess rb/el dudu,Nazzahra Lidwina Naira Sutari,Anggota,"Desain, Dokumentasi, dan Visual",Dokumentasi,njy.neii
+19,Ruru,Oriana Toha,Koordinator Sub-sekbid,"Desain, Dokumentasi, dan Visual",Kreatif,orianaa.th
+48,hansol/hassel/audric,Hassel Audric,Anggota,"Desain, Dokumentasi, dan Visual",Kreatif,thy_oiis.10
+74,mia/meye,Almira Simiya Nadhifa Ridho,Anggota,"Desain, Dokumentasi, dan Visual",Kreatif,simiya_nadhifa
+52,keilyn/kenei,Keneisha Jocelyn Herrin,Anggota,"Desain, Dokumentasi, dan Visual",Kreatif,keiii.jlyn
+79,Auau/Orel/,Aurelia Yusafira Muslim,Anggota,"Desain, Dokumentasi, dan Visual",Kreatif,arl.ysm
+25,arin/ryn,Kharyn Vanesta Husnafsky,Anggota,"Desain, Dokumentasi, dan Visual",Kreatif,kharyn_vanesta
+100,Iyut imut,Ruth Abigail Levana,Koordinator,Keimanan dan Ketaqwaan Terhadap Tuhan Yang Maha Esa,,ruthabigals
+55,piyayoy,Luthfiyah Khairunnisa,Anggota,Keimanan dan Ketaqwaan Terhadap Tuhan Yang Maha Esa,,thfiannisa
+29,"repak, epa, repa",Revaline Tan Aurellia,Anggota,Keimanan dan Ketaqwaan Terhadap Tuhan Yang Maha Esa,,revvllyn
+40,martellok,Marcello Deven Husada,Anggota,Keimanan dan Ketaqwaan Terhadap Tuhan Yang Maha Esa,,marc.deven
+10,abil/nabil/nabila,Nabila Putri Awaliyah,Koordinator,Sosial,,a._.bill
+88,Trezz/hyper aktip /Triver/,Treesha,Anggota,Sosial,,treesha_1228 
+75,Nanda,Nanda Syahnila Mufidah,Anggota,Sosial,,nandsnl
+80,War/Wer/NERO,Warren Tio,Anggota,Sosial,,wrrento
+47,Celo/Selo,Marcelo William L. Tobing,Anggota,Sosial,,william.tbg
+93,misyela/niyot,Michaela Nathania,Anggota,Sosial,,mchaela.nath
+43,Qutbi/Idoel/Ubik,Mahasin Qutbi,Anggota,Sosial,,mi.mayy_
+14,cath/ceen,Catherine Novia Hartanto,Koordinator Sub-sekbid,Environment and Governance,Environment,nviaa_cath
+16,"jessie,caren,jess",Jesicaren Natali Siregar,Anggota,Environment and Governance,Environment,jescrentli
+32,Chika / Jejes,Jessica Aulia Putri,Anggota,Environment and Governance,Environment,Jejessicaa_aulia
+73,joi ,Joice Theresia Simanjuntak,Anggota,Environment and Governance,Environment,jjoice__
+22,jacq,Jacqueline,Anggota,Environment and Governance,Environment,jxc.qln
+,Nick/nikson,Andrew Nickson,Koordinator Sub-sekbid,Environment and Governance,Governance,
+76,sisil,Priscilla Meisandri Lim,Anggota,Environment and Governance,Governance,prscllaml
+83,sidni ,Sydney Gracelyn Wang,Anggota,Environment and Governance,Governance,grracelynnwang 
+41,lex/jimbok/alex berisik,Alexandro Risamanto,Anggota,Environment and Governance,Governance,alexxrisam
+71,pika/fiq/syafiqah,Syafiqah Amirah Luthfiyah,Anggota,Environment and Governance,Governance,syfqahamiraa
+9,Dapa/daqee/emsih,Muhammad Daffa Aqeela Shidqi,Koordinator,Teknologi dan Komunikasi,,@dffshdqi
+49,Ris/Risha/Rishanda,Rishanda Auliya Putri ,Anggota,Teknologi dan Komunikasi,,rishanda_auliya_putri_
+59,paulus / quin puisi,Quinsha Hidayatun Nazilla,Anggota,Teknologi dan Komunikasi,,@quinshapaulus
+99,Nadine/Cheryl/Nanad,Nadine Cheryl,Anggota,Teknologi dan Komunikasi,,nadine.and.you
+89,Fia,Alifia Mazaya Syauqina,Anggota,Teknologi dan Komunikasi,,fia.mzy
+92,Chalca,Lukluk Neci Salsabila,Anggota,Teknologi dan Komunikasi,,Luklukncsa
+05,"lip, livi",Livia Atriana Taufiek,Koordinator,Bahasa,,@lvxy.liv
+85,Amy/Umy/Mirah Mirja,Amirah Mirza Hanania,Anggota,Bahasa,,swastramirah
+97,Capa/kakcapa,M. Chava Putra Anugra,Anggota,Bahasa,,@chavaanugra
+64,yena/pien/pen,Viena Yang,Anggota,Bahasa,,@vienayg
+20,Irli/kris/tata,Krisensia Early Renata,Koordinator ,Apresiasi Seni dan Olahraga,,Earlysadat
+82,lin/sisi,Celine Livina Rusli,Anggota,Apresiasi Seni & Olahraga,,celinelivina
+24,abonnita,Aurel Bonnita Gultom,Koordinator Sub-sekbid,Apresiasi Seni & Olahraga,Klub Olahraga,aurel.bonnita
+45,queen,Quaneisha Aqeela Hasan ,Anggota,Apresiasi Seni dan Olahraga,,quaneishaaqeela_
+91,Devina/Depinaak~,Devina Aurelia Theng Situmorang,Anggota,Apresiasi Seni dan Olahraga,,devina.aureliaa
+31,fai,Nyimas Faiza Athaya,Koordinator Sub-sekbid,Apresiasi Seni dan Olahraga,Klub Seni,nyfza_
+95,Umik/Brozu/Ipoet,Putri Syifa Azzahra,Koordinator Sub-sekbid,Apresiasi Seni dan Olahraga,Klub Penalaran,raassyia
+12,Rihanna/canva editor/ nana si gembrot,Rihanna Maheswari Sastradiredja,Koordinator Sub-sekbid,Broadcasting,Ilustrator,rihanmahes
+72,alay/laya,Ramadhani Alaya Rasyid,Anggota,Broadcasting,Ilustrator,alaya.zip
+30,Jess,Jessica Diantha Putri,Anggota,Broadcasting,Ilustrator,Jdiantha
+65,piree,Zavira Zavieri Farizah,Anggota,Broadcasting,Ilustrator,_zvirvier
+33,Tifanie/Tifunny,Tifanie Elvaretta,Anggota,Broadcasting,Ilustrator,tifanie_elvaretta
+38,Atha/thaa/Kang edit,Abdul Atha Mori,Koordinator Sub-sekbid,Broadcasting,Video Editor,thawrld__
+68,enik,Rahmad Ardhani Arba’a,Anggota,Broadcasting,Video Editor,Rahmad_arbaa
+67,dita/dea,Deanisha Pramudita Ayu Gumilang,Anggota,Broadcasting,Video Editor,prmuditagumilang
+,Sony,Muhammad Sony Yulianto,Anggota,Broadcasting,Video Editor,sonyulian
+58,Ziziee,Syarafana Aziza,Anggota,Broadcasting,Video Editor,syrfnnaa
+50,"apel, peline",Aveline Calista Zora Adriansyah, Koordinator Sub-ekbid,Broadcasting,Produser,velllineeee1
+44,Peli/Kain Pel/Feli,Felisa Zhafirah ,Anggota,Broadcasting,Produser,felisazhafirahh 
+61,"ekik, rezky/tabib istana/ray orang timur",Rezky Zahran,Anggota,Broadcasting,Produser,rezky_vro
+66,Jaqueen King As/Yori/FioriOri,Jaqueen Sheeva Millefiori,Anggota,Broadcasting,Produser,millefiori_710
+57,Chee/Ceyin,Cherine Chiandiary,Anggota,Broadcasting,Produser,cherine_chian
