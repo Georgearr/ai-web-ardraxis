@@ -42,10 +42,14 @@ export function ChatInterface() {
             )}
           </>
         ) : (
-          <EmptyState
-            suggestions={suggestions}
-            onSuggestionClick={send}
-          />
+          <div className="flex min-h-full flex-col">
+            <div className="flex-1" />
+            <EmptyState
+              suggestions={suggestions}
+              onSuggestionClick={send}
+            />
+            <div className="flex-1" />
+          </div>
         )}
       </div>
       <ChatInput onSend={send} disabled={isStreaming} />

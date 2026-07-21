@@ -1,11 +1,15 @@
-import google.generativeai as genai
+"""
+DEPRECATED: This module is kept for backward compatibility.
+New code should use services.ai_service and services.deepseek_service.
+The build_context() function is still used and maintained here.
+"""
+
 from pathlib import Path
 
-from config import Config
 from utils.logger import logger
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
-SYSTEM_PROMPT_PATH = BACKEND_DIR / "system_prompt.txt"
+SYSTEM_PROMPT_PATH = BACKEND_DIR / "prompts" / "system_prompt.txt"
 
 
 def _load_system_prompt() -> str:
@@ -20,13 +24,14 @@ def _load_system_prompt() -> str:
         )
 
 
-def init_gemini():
-    genai.configure(api_key=Config.GEMINI_API_KEY)
+SYSTEM_PROMPT = _load_system_prompt()
 
 
 def build_context(
     members_data: list[dict],
     events_data: list[dict],
+    faqs_data: list[dict],
+    programs_data: list[dict],
     matched_sekbids: list[str] | None = None,
 ) -> str:
     context_parts = []
@@ -80,18 +85,27 @@ def build_context(
     else:
         context_parts.append("(Tidak ada event tercatat)")
 
+    context_parts.append("")
+    context_parts.append("=== DATA PROGRAM KERJA ===")
+    if programs_data:
+        for p in programs_data:
+            context_parts.append(
+                f"- {p.get('nama_program')} ({p.get('sekbid')}) - {p.get('deskripsi')}"
+            )
+    else:
+        context_parts.append("(Tidak ada program kerja tercatat)")
+
+    context_parts.append("")
+    context_parts.append("=== DATA FAQ ===")
+    if faqs_data:
+        for faq in faqs_data:
+            context_parts.append(
+                f"Q: {faq.get('pertanyaan')}"
+            )
+            context_parts.append(
+                f"A: {faq.get('jawaban')}"
+            )
+    else:
+        context_parts.append("(Tidak ada FAQ tercatat)")
+
     return "\n".join(context_parts)
-
-
-SYSTEM_PROMPT = _load_system_prompt()
-
-
-def ask_gemini(user_message: str, context: str) -> str:
-    try:
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        full_prompt = f"{SYSTEM_PROMPT}\n\n{context}\n\nPertanyaan: {user_message}"
-        response = model.generate_content(full_prompt)
-        return response.text.strip()
-    except Exception as e:
-        logger.error("Gemini API error: %s", e)
-        return "Maaf, terjadi kesalahan saat memproses pertanyaan Anda. Silakan coba lagi."

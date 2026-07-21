@@ -28,7 +28,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t border-[rgba(255,255,255,0.08)] px-4 py-3">
+    <div className="border-t border-[rgba(255,255,255,0.08)] px-4 py-2 md:py-3">
       <div className="mx-auto flex max-w-3xl items-center gap-2">
         <input
           ref={inputRef}
@@ -38,6 +38,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           placeholder="Tanyakan tentang OSIS..."
           disabled={disabled}
+          suppressHydrationWarning
           className="flex h-10 w-full rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.25)] px-4 text-sm text-white placeholder:text-[#b2dfdb]/50 shadow-[0_6px_18px_rgba(0,0,0,0.35)] backdrop-blur-[6px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#96cccd] disabled:cursor-not-allowed disabled:opacity-50"
         />
         <button

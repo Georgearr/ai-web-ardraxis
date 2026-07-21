@@ -3,7 +3,6 @@ import re
 
 SEMANTIC_MAP: dict[str, str] = {
     "website": "Multimedia Website",
-    "it": "Multimedia Website",
     "developer": "Multimedia Website",
     "programmer": "Multimedia Website",
     "technology": "Multimedia Website",

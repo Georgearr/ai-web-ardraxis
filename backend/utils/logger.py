@@ -5,7 +5,9 @@ from pathlib import Path
 
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
-LOG_FILE = BACKEND_DIR / "app.log"
+LOG_DIR = BACKEND_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+LOG_FILE = LOG_DIR / "app.log"
 
 
 def setup_logger(name: str = "drax") -> logging.Logger:

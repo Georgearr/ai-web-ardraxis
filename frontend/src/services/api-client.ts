@@ -1,12 +1,10 @@
 import type { ChatRequest, ChatResponse, SuggestionsResponse } from "@/types/api"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1"
-
 async function request<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<T> {
-  const url = `${API_BASE}${endpoint}`
+  const url = `/api${endpoint}`
 
   const response = await fetch(url, {
     headers: {

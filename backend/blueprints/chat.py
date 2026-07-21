@@ -2,10 +2,15 @@ from flask import Blueprint, request, jsonify
 from utils.sanitizer import sanitize_message
 from utils.logger import logger
 from services.semantic_service import find_sekbids
-from services.sheet_service import get_members, get_events
-from config import Config
-from services.gemini_service import init_gemini, build_context, ask_gemini
-from services.mock_service import mock_ai_response
+from services.csv_service import csv_store
+from services.gemini_service import build_context
+from services.ai_service import ask_ai
+from services.intent_service import (
+    Intent,
+    detect_intent,
+    process_intent,
+    build_intent_context,
+)
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -25,23 +30,40 @@ def chat():
 
         logger.info("Processing message: %.100s", message)
 
-        member_models = get_members()
-        event_models = get_events()
+        member_models = csv_store.get_members()
+        event_models = csv_store.get_events()
+        faq_models = csv_store.get_faqs()
+        program_models = csv_store.get_programs()
+
         members = [m.to_dict() for m in member_models]
         events = [e.to_dict() for e in event_models]
+        faqs = [f.to_dict() for f in faq_models]
+        programs = [p.to_dict() for p in program_models]
 
         matched_sekbids = find_sekbids(message)
 
-        if Config.use_mock_ai():
-            response = mock_ai_response(message, member_models, event_models)
-        else:
-            context = build_context(members, events, matched_sekbids)
-            init_gemini()
-            response = ask_gemini(message, context)
+        intent = detect_intent(message)
+
+        if intent == Intent.UNKNOWN and matched_sekbids:
+            intent = Intent.MEMBER_SEARCH
+
+        logger.info("Detected intent: %s", intent.value)
+
+        result = process_intent(
+            intent, message,
+            member_models, event_models, faq_models, program_models,
+            matched_sekbids,
+        )
+
+        context = build_intent_context(result)
+        if not context:
+            context = build_context(members, events, faqs, programs, matched_sekbids)
+        response = ask_ai(message, context)
 
         logger.info(
-            "Response generated (len=%d, matched_sekbids=%s)",
+            "Response generated (len=%d, intent=%s, matched_sekbids=%s)",
             len(response),
+            intent.value,
             matched_sekbids,
         )
 

@@ -7,19 +7,19 @@ interface EmptyStateProps {
 
 export function EmptyState({ onSuggestionClick, suggestions }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-12 text-center animate-fade-in">
-      <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.12)] backdrop-blur-[6px] shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
-        <span className="text-4xl font-black text-transparent bg-gradient-to-br from-white to-[#b2dfdb] bg-clip-text">
+    <div className="flex flex-col items-center px-4 py-4 text-center animate-fade-in">
+      <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.12)] backdrop-blur-[6px] shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+        <span className="text-3xl font-black text-transparent bg-gradient-to-br from-white to-[#b2dfdb] bg-clip-text md:text-4xl">
           D
         </span>
       </div>
-      <h2 className="mb-1 text-xl font-black tracking-[0.5px] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
+      <h2 className="mb-1 text-lg font-black tracking-[0.5px] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)] md:text-xl">
         DRAX
       </h2>
-      <p className="mb-1 text-xs font-extrabold tracking-[0.3px] text-[#96cccd] uppercase">
+      <p className="mb-1 text-[11px] font-extrabold tracking-[0.3px] text-[#96cccd] uppercase md:text-xs">
         Digital Resource Assistant of ARDRAXIS
       </p>
-      <p className="mb-8 max-w-md text-sm font-light tracking-[1px] text-[#b2dfdb] leading-relaxed">
+      <p className="mb-4 max-w-md text-sm font-light tracking-[1px] text-[#b2dfdb] leading-relaxed">
         Empowering Information, Igniting Innovation.
         <br />
         Tanyakan tentang OSIS SMA Ignatius Global School.

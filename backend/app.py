@@ -8,6 +8,8 @@ from middleware.rate_limit import init_rate_limiter
 from blueprints.health import health_bp
 from blueprints.chat import chat_bp
 from blueprints.suggestions import suggestions_bp
+from blueprints.members import members_bp
+from blueprints.events_bp import events_bp
 
 BACKEND_DIR = Path(__file__).resolve().parent
 
@@ -27,6 +29,8 @@ def create_app() -> Flask:
     app.register_blueprint(health_bp, url_prefix="/api/v1")
     app.register_blueprint(chat_bp, url_prefix="/api/v1")
     app.register_blueprint(suggestions_bp, url_prefix="/api/v1")
+    app.register_blueprint(members_bp, url_prefix="/api/v1")
+    app.register_blueprint(events_bp, url_prefix="/api/v1")
 
     @app.errorhandler(404)
     def not_found(_e):

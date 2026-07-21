@@ -7,10 +7,12 @@ SUGGESTIONS = [
     "Event terdekat apa?",
     "Siapa yang mengurus website?",
     "Siapa yang mengurus Instagram?",
-    "Apa tugas Governance?",
+    "Apa itu ARDRAXIS?",
     "Siapa koordinator Multimedia Website?",
-    "Berapa jumlah anggota OSIS?",
+    "Program kerja apa saja?",
     "Apa Instagram OSIS?",
+    "Apa saja sekbid di ARDRAXIS?",
+    "Siapa Wakil Ketua OSIS?",
 ]
 
 
