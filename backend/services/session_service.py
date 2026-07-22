@@ -13,6 +13,9 @@ class SessionData:
     last_intent: str = ""
     last_entity: str = ""
     last_context: str = ""
+    last_member: str = ""
+    last_sekbid: str = ""
+    last_event: str = ""
     updated_at: float = 0.0
 
 
@@ -39,17 +42,32 @@ class SessionStore:
         context: str = "",
         intent: str = "",
         entity: str = "",
+        last_member: str = "",
+        last_sekbid: str = "",
+        last_event: str = "",
     ):
         with self._lock:
             data = SessionData(
                 last_intent=intent,
                 last_entity=entity,
                 last_context=context,
+                last_member=last_member,
+                last_sekbid=last_sekbid,
+                last_event=last_event,
                 updated_at=time.time(),
             )
             self._store[session_id] = data
-            entity_preview = entity[:60] if entity else "(empty)"
-            logger.info("[SESSION] New context saved: %s", entity_preview)
+        self._log_session(session_id)
+
+    def _log_session(self, session_id: str) -> None:
+        session = self._store.get(session_id)
+        if not session:
+            return
+        logger.info("=== SESSION ===")
+        logger.info("  last_member : %s", session.last_member or "-")
+        logger.info("  last_sekbid : %s", session.last_sekbid or "-")
+        logger.info("  last_event  : %s", session.last_event or "-")
+        logger.info("=" * 14)
 
     def clear_expired(self):
         with self._lock:
@@ -86,6 +104,24 @@ class SessionStore:
         session = self.get(session_id)
         if session:
             return session.last_intent
+        return None
+
+    def get_last_sekbid(self, session_id: str) -> Optional[str]:
+        session = self.get(session_id)
+        if session:
+            return session.last_sekbid or None
+        return None
+
+    def get_last_member(self, session_id: str) -> Optional[str]:
+        session = self.get(session_id)
+        if session:
+            return session.last_member or None
+        return None
+
+    def get_last_event(self, session_id: str) -> Optional[str]:
+        session = self.get(session_id)
+        if session:
+            return session.last_event or None
         return None
 
 
