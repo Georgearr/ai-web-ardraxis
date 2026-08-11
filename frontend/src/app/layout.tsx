@@ -20,9 +20,9 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className="bg-ardraxis-dark min-h-screen antialiased">
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-dvh flex-col">
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex min-h-0 flex-1 flex-col">{children}</main>
           <Footer />
         </div>
       </body>

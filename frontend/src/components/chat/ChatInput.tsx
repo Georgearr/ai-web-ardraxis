@@ -28,7 +28,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t border-[rgba(255,255,255,0.08)] px-4 py-2 md:py-3">
+    <div className="border-t border-[rgba(255,255,255,0.08)] px-4 pt-2 md:pt-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex-shrink-0">
       <div className="mx-auto flex max-w-3xl items-center gap-2">
         <input
           ref={inputRef}

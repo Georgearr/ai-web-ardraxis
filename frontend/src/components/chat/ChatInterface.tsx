@@ -8,10 +8,13 @@ import { MessageList } from "./MessageList"
 import { ChatInput } from "./ChatInput"
 import { LoadingIndicator } from "./LoadingIndicator"
 
+const NEAR_BOTTOM_THRESHOLD = 160
+
 export function ChatInterface() {
   const { messages, isStreaming, error, send } = useChat()
   const [suggestions, setSuggestions] = useState<string[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
+  const nearBottomRef = useRef(true)
 
   useEffect(() => {
     getSuggestions()
@@ -25,14 +28,38 @@ export function ChatInterface() {
       })
   }, [])
 
+  const handleScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    nearBottomRef.current =
+      el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_THRESHOLD
+  }
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    if (nearBottomRef.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" })
+    }
+  }, [messages, isStreaming, error])
+
+  const handleSend = (message: string) => {
+    nearBottomRef.current = true
+    send(message)
+  }
+
   const hasMessages = messages.length > 0
 
   return (
-    <div className="flex h-full flex-col">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-thin">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="min-h-0 flex-1 overflow-y-auto scrollbar-thin"
+      >
         {hasMessages ? (
           <>
-            <MessageList messages={messages} scrollRef={scrollRef} />
+            <MessageList messages={messages} />
             {isStreaming && <LoadingIndicator />}
             {error && (
               <div className="px-4 pb-4">
@@ -47,13 +74,13 @@ export function ChatInterface() {
             <div className="flex-1" />
             <EmptyState
               suggestions={suggestions}
-              onSuggestionClick={send}
+              onSuggestionClick={handleSend}
             />
             <div className="flex-1" />
           </div>
         )}
       </div>
-      <ChatInput onSend={send} disabled={isStreaming} />
+      <ChatInput onSend={handleSend} disabled={isStreaming} />
     </div>
   )
 }

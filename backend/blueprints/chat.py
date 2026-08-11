@@ -16,6 +16,12 @@ from services.intent_service import (
     is_special_faq_query,
     _detect_responsibility,
     _detect_entity_mention,
+    build_responsibility_response,
+    is_valid_responsibility_response,
+    build_member_response,
+    is_valid_member_response,
+    build_list_members_response,
+    is_valid_list_members_response,
 )
 from services.session_service import session_store
 
@@ -258,10 +264,12 @@ def chat():
                 logger.info("Entity mention detected: %s – overriding to MEMBER_SEARCH", entity_type)
                 intent = Intent.MEMBER_SEARCH
 
-        # Responsibility query overrides member/list/event/program intents –
+        # Responsibility query overrides member/event/program intents –
         # structural sekbid answer instead of person/event/program listing.
+        # LIST_MEMBERS ("siapa saja anggota X?") is explicitly a list query
+        # and must NOT be overridden.
         resp_match = _detect_responsibility(message, member_models)
-        if intent in (Intent.MEMBER_SEARCH, Intent.LIST_MEMBERS,
+        if intent in (Intent.MEMBER_SEARCH,
                       Intent.EVENT_SEARCH, Intent.PROGRAM_SEARCH) and resp_match:
             # Keep person-level intent when:
             # 1) Query matched a specific individual (full name, nickname, Instagram, alias)
@@ -311,6 +319,30 @@ def chat():
             return jsonify({"response": fallback}), 200
 
         response = ask_ai(message, context)
+
+        # Intent-aware validation: the LLM may generate the wrong format or
+        # deny data that the backend already retrieved.  Each intent has a
+        # deterministic fallback built from backend data.
+        if intent == Intent.RESPONSIBILITY and result.get("matched"):
+            if not is_valid_responsibility_response(response, result):
+                logger.warning(
+                    "[VALIDATION] LLM response invalid for RESPONSIBILITY – using deterministic fallback"
+                )
+                response = build_responsibility_response(result)
+        elif (intent == Intent.MEMBER_SEARCH
+              and result.get("match_type") in ("name", "instagram")
+              and len(result.get("matched", [])) == 1):
+            if not is_valid_member_response(response, result, member_models):
+                logger.warning(
+                    "[VALIDATION] LLM response invalid for MEMBER_SEARCH – using deterministic member profile"
+                )
+                response = build_member_response(result)
+        elif intent == Intent.LIST_MEMBERS and result.get("matched"):
+            if not is_valid_list_members_response(response, result):
+                logger.warning(
+                    "[VALIDATION] LLM response invalid for LIST_MEMBERS – using deterministic member list"
+                )
+                response = build_list_members_response(result)
 
         logger.info(
             "Response generated (len=%d, intent=%s, matched_sekbids=%s)",

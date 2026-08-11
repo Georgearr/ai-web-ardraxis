@@ -876,3 +876,337 @@ def build_intent_context(result: dict[str, Any]) -> str:
         return ""
 
     return "\n".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# RESPONSIBILITY – deterministic fallback & LLM-response validation
+# ---------------------------------------------------------------------------
+
+# Phrases that invalidate an LLM-generated RESPONSIBILITY answer.  When the
+# backend already matched a sekbid and its members, the answer MUST present
+# that data – never deny it or redirect the user to ask someone else.
+_RESPONSIBILITY_INVALID_PATTERNS: list[re.Pattern] = [
+    re.compile(r"tidak\s+memiliki\s+informasi", re.IGNORECASE),
+    re.compile(r"informasi\s+tidak\s+(tersedia|ditemukan)", re.IGNORECASE),
+    re.compile(r"tidak\s+(ditemukan|tersedia)", re.IGNORECASE),
+    re.compile(r"data\s+yang\s+diberikan", re.IGNORECASE),
+    re.compile(r"silakan\s+bertanya", re.IGNORECASE),
+    re.compile(r"silahkan\s+bertanya", re.IGNORECASE),
+    re.compile(r"bertanya\s+(langsung\s+)?(kepada|ke|pada)", re.IGNORECASE),
+    re.compile(r"(tanya|tanyakan|hubungi|menghubungi|kontak)", re.IGNORECASE),
+    re.compile(r"cari\s+tahu\s+sendiri", re.IGNORECASE),
+    re.compile(r"user\s*safety", re.IGNORECASE),
+    re.compile(r"system\s*prompt", re.IGNORECASE),
+    re.compile(r"as\s+an\s+ai", re.IGNORECASE),
+    re.compile(r"sebagai\s+(sebuah\s+)?ai", re.IGNORECASE),
+    re.compile(r"instruksi\s+internal", re.IGNORECASE),
+]
+
+
+def _squash_text(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", text.lower())
+
+
+def _significant_name_tokens(full_name: str) -> set[str]:
+    words = re.findall(r"[a-z0-9]+", full_name.lower())
+    return {w for w in words if len(w) >= 4}
+
+
+def build_responsibility_response(result: dict[str, Any]) -> str:
+    """Deterministic RESPONSIBILITY answer built directly from backend data.
+
+    Used when the LLM response fails validation.  Never denies the data and
+    always presents the matched sekbid plus every matched member.
+    """
+    matched = result.get("matched", [])
+    resp = result.get("responsibility") or {}
+    if not matched:
+        return ""
+
+    sekbid = resp.get("sekbid", "")
+    sub = resp.get("sub_sekbid")
+    keyword = resp.get("keyword", "")
+
+    sekbid_display = f"{sekbid} ({sub})" if sub else sekbid
+
+    if keyword and (not sub or len(keyword) > len(sub)):
+        task = keyword
+    else:
+        task = sub or keyword or sekbid
+    task_label = task.title()
+
+    lines = [f"Pengelolaan {task_label} berada di bawah Sekbid {sekbid_display}."]
+
+    coordinators = [m for m in matched
+                    if m.jabatan and "koordinator" in m.jabatan.lower()]
+    coord_names = {c.nama_lengkap for c in coordinators}
+    if coordinators:
+        lines.append("")
+        lines.append("Koordinator:")
+        for c in coordinators:
+            line = f"- {c.nama_lengkap}"
+            if c.nama_panggilan:
+                line += f" ({c.nama_panggilan})"
+            lines.append(line)
+
+    anggota = [m for m in matched if m.nama_lengkap not in coord_names]
+    if anggota:
+        lines.append("")
+        lines.append("Anggota:")
+        for a in anggota:
+            lines.append(f"- {a.nama_lengkap}")
+
+    return "\n".join(lines)
+
+
+def is_valid_responsibility_response(response: str,
+                                     result: dict[str, Any]) -> bool:
+    """Return False when the LLM answer contradicts or omits backend data."""
+    if not response or not response.strip():
+        return False
+
+    resp = result.get("responsibility") or {}
+    sekbid = resp.get("sekbid", "")
+    sub = resp.get("sub_sekbid")
+
+    response_sq = _squash_text(response)
+    if not response_sq:
+        return False
+
+    for pattern in _RESPONSIBILITY_INVALID_PATTERNS:
+        if pattern.search(response):
+            logger.warning(
+                "[VALIDATION] RESPONSIBILITY response contains forbidden phrase: %s",
+                pattern.pattern,
+            )
+            return False
+
+    if sekbid and _squash_text(sekbid) not in response_sq:
+        logger.warning(
+            "[VALIDATION] RESPONSIBILITY response missing sekbid name: %s",
+            sekbid,
+        )
+        return False
+    if sub and _squash_text(sub) not in response_sq:
+        logger.warning(
+            "[VALIDATION] RESPONSIBILITY response missing sub-sekbid name: %s",
+            sub,
+        )
+        return False
+
+    matched = result.get("matched", [])
+    coord_names = {m.nama_lengkap for m in matched
+                   if m.jabatan and "koordinator" in m.jabatan.lower()}
+    coord_tokens: set[str] = set()
+    for name in coord_names:
+        coord_tokens |= _significant_name_tokens(name)
+
+    anggota = [m for m in matched if m.nama_lengkap not in coord_names]
+    if anggota:
+        for a in anggota:
+            tokens = _significant_name_tokens(a.nama_lengkap) - coord_tokens
+            if any(t in response_sq for t in tokens):
+                return True
+        logger.warning(
+            "[VALIDATION] RESPONSIBILITY response only mentions the coordinator – no anggota from context"
+        )
+        return False
+
+    return True
+
+
+# ---------------------------------------------------------------------------
+# MEMBER/PERSON – deterministic profile & LLM-response validation
+# ---------------------------------------------------------------------------
+
+# Format artifacts that belong to RESPONSIBILITY / sekbid templates – a
+# person-query answer ("Siapa George?") must never use them.
+_MEMBER_TEMPLATE_PATTERNS: list[re.Pattern] = [
+    re.compile(r"pengelolaan\b", re.IGNORECASE),
+    re.compile(r"berada\s+di\s+bawah\s+sekbid", re.IGNORECASE),
+    re.compile(r"(?:^|\n)\s*(?:sekbid|koordinator|anggota)\s*:\s*\n",
+               re.IGNORECASE),
+]
+
+_COMMON_NAME_TOKENS: frozenset[str] = frozenset({
+    "yang", "dengan", "untuk", "dari", "tidak", "sudah", "akan", "sangat",
+    "serta", "karena", "ada", "ini", "itu", "bisa", "dapat", "adalah",
+    "juga", "pada", "oleh", "dalam", "saya", "anda", "kamu", "dia", "ia",
+    "beliau", "biasa", "dipanggil", "resminya", "sekolah", "osis", "sma",
+    "kabinet", "anggota", "sekbid", "koordinator", "instagram", "yang",
+})
+
+
+def build_member_response(result: dict[str, Any]) -> str:
+    """Deterministic profile answer for a person lookup ("Siapa George?").
+
+    Uses only facts present in the backend data (name, nickname, jabatan,
+    sekbid, Instagram) – never infers duties from the jabatan.
+    """
+    matched = result.get("matched", [])
+    if not matched:
+        return ""
+    m = matched[0]
+
+    if m.nama_panggilan:
+        head = f"{m.nama_lengkap}, biasa dipanggil {m.nama_panggilan},"
+    else:
+        head = f"{m.nama_lengkap} "
+
+    role_parts = []
+    if m.jabatan:
+        role_parts.append(m.jabatan)
+    if m.sekbid:
+        role_parts.append(m.sekbid)
+    if m.sub_sekbid:
+        role_parts.append(f"({m.sub_sekbid})")
+    role = " ".join(role_parts) or "anggota OSIS"
+
+    lines = [
+        f"{head} adalah {role} di OSIS SMA Ignatius Global School (Kabinet ARDRAXIS)."
+    ]
+
+    if m.instagram:
+        instagram_line = f"Instagram resminya: @{m.instagram.lstrip('@')}"
+        emoji = m.position_emoji()
+        if emoji:
+            instagram_line += f" {emoji}"
+        lines.append("")
+        lines.append(instagram_line)
+    elif m.deskripsi:
+        lines.append("")
+        lines.append(f"Deskripsi: {m.deskripsi}")
+
+    return "\n".join(lines)
+
+
+def is_valid_member_response(response: str,
+                             result: dict[str, Any],
+                             member_models: list[Member] | None = None) -> bool:
+    """Return False when a person-query answer uses the wrong format
+
+    (responsibility template, sekbid member listing) or denies the data.
+    """
+    if not response or not response.strip():
+        return False
+
+    matched = result.get("matched", [])
+    if not matched:
+        return False
+    member = matched[0]
+
+    response_sq = _squash_text(response)
+    if not response_sq:
+        return False
+
+    for pattern in _RESPONSIBILITY_INVALID_PATTERNS:
+        if pattern.search(response):
+            logger.warning(
+                "[VALIDATION] MEMBER response contains forbidden phrase: %s",
+                pattern.pattern,
+            )
+            return False
+
+    for pattern in _MEMBER_TEMPLATE_PATTERNS:
+        if pattern.search(response):
+            logger.warning(
+                "[VALIDATION] MEMBER response uses responsibility/sekbid template: %s",
+                pattern.pattern,
+            )
+            return False
+
+    own_tokens = _significant_name_tokens(member.nama_lengkap)
+    if not any(t in response_sq for t in own_tokens):
+        logger.warning(
+            "[VALIDATION] MEMBER response missing the person's own name: %s",
+            member.nama_lengkap,
+        )
+        return False
+
+    # The answer must not list other members of the same sekbid.
+    if member_models:
+        for other in member_models:
+            if other.nama_lengkap.lower() == member.nama_lengkap.lower():
+                continue
+            for t in _significant_name_tokens(other.nama_lengkap):
+                if t in own_tokens or t in _COMMON_NAME_TOKENS:
+                    continue
+                if t in response_sq:
+                    logger.warning(
+                        "[VALIDATION] MEMBER response mentions another member: %s (%s)",
+                        other.nama_lengkap, t,
+                    )
+                    return False
+
+    return True
+
+
+# ---------------------------------------------------------------------------
+# LIST_MEMBERS – deterministic member-list & LLM-response validation
+# ---------------------------------------------------------------------------
+
+def build_list_members_response(result: dict[str, Any]) -> str:
+    """Deterministic list answer for "Siapa saja anggota <sekbid>?"."""
+    matched = result.get("matched", [])
+    if not matched:
+        return ""
+
+    lines = []
+    coordinators = [m for m in matched
+                    if m.jabatan and "koordinator" in m.jabatan.lower()]
+    coord_names = {c.nama_lengkap for c in coordinators}
+    if coordinators:
+        lines.append("Koordinator:")
+        for c in coordinators:
+            lines.append(f"- {c.nama_lengkap}")
+        lines.append("")
+
+    anggota = [m for m in matched if m.nama_lengkap not in coord_names]
+    if anggota:
+        lines.append("Anggota:")
+        for a in anggota:
+            lines.append(f"- {a.nama_lengkap}")
+
+    return "\n".join(lines)
+
+
+def is_valid_list_members_response(response: str,
+                                   result: dict[str, Any]) -> bool:
+    """Return False when a sekbid-list answer denies data or uses the
+    responsibility template instead of a plain member list."""
+    if not response or not response.strip():
+        return False
+
+    matched = result.get("matched", [])
+    if not matched:
+        return False
+
+    response_sq = _squash_text(response)
+    if not response_sq:
+        return False
+
+    for pattern in _RESPONSIBILITY_INVALID_PATTERNS:
+        if pattern.search(response):
+            logger.warning(
+                "[VALIDATION] LIST response contains forbidden phrase: %s",
+                pattern.pattern,
+            )
+            return False
+
+    if (re.search(r"pengelolaan\b", response, re.IGNORECASE)
+            or re.search(r"berada\s+di\s+bawah\s+sekbid", response,
+                         re.IGNORECASE)):
+        logger.warning(
+            "[VALIDATION] LIST response uses responsibility template"
+        )
+        return False
+
+    for m in matched:
+        tokens = _significant_name_tokens(m.nama_lengkap)
+        if any(t in response_sq for t in tokens):
+            return True
+
+    logger.warning(
+        "[VALIDATION] LIST response mentions no member from context"
+    )
+    return False
