@@ -49,7 +49,7 @@ def create_app() -> Flask:
     app.register_blueprint(chat_bp, url_prefix="/api", name="chat_api")
     app.register_blueprint(suggestions_bp, url_prefix="/api", name="suggestions_api")
 
-    def _find_file(filename):
+    def _send_file(filename):
         candidates = [
             MAIN_PAGE_DIR / filename,
             FRONTEND_OUT_DIR / filename,
@@ -57,26 +57,29 @@ def create_app() -> Flask:
         ]
         for candidate in candidates:
             if candidate.exists() and candidate.is_file():
-                return candidate.parent, candidate.name
-        return None, None
+                return send_from_directory(str(candidate.parent), candidate.name)
+        return None
 
-    # Route: Landing page
+    # Route: Chatbot AI D'RAX Interface (Default on / and /chat)
     @app.route("/")
-    @app.route("/home")
-    def serve_home():
-        dir_path, name = _find_file("index.html")
-        if dir_path and name:
-            return send_from_directory(str(dir_path), name)
-        return "<h1>ARDRAXIS Web App Ready</h1><p>Running on Python Flask.</p>", 200
-
-    # Route: D'RAX Chat Interface
     @app.route("/chat")
     @app.route("/coming_soon")
     def serve_chat():
-        dir_path, name = _find_file("index.html")
-        if dir_path and name:
-            return send_from_directory(str(dir_path), name)
-        return "<h1>D'RAX Chat Interface</h1>", 200
+        resp = _send_file("chat.html")
+        if resp:
+            return resp
+        resp = _send_file("index.html")
+        if resp:
+            return resp
+        return "<h1>D'RAX Chat Assistant</h1>", 200
+
+    # Route: Landing Page OSIS (on /home)
+    @app.route("/home")
+    def serve_home():
+        resp = _send_file("index.html")
+        if resp:
+            return resp
+        return serve_chat()
 
     # Serve JS folder
     @app.route("/js/<path:filename>")
@@ -96,14 +99,14 @@ def create_app() -> Flask:
             return send_from_directory(str(FRONTEND_OUT_DIR), filename)
         return {"error": "Static file not found"}, 404
 
-    # Catch-all for root files (CSS, images, HTML)
+    # Catch-all for root files
     @app.route("/<path:filename>")
     def serve_root_files(filename):
         if filename.startswith("api/"):
             return {"error": "API route not found"}, 404
-        dir_path, name = _find_file(filename)
-        if dir_path and name:
-            return send_from_directory(str(dir_path), name)
+        resp = _send_file(filename)
+        if resp:
+            return resp
         return {"error": f"File {filename} not found"}, 404
 
     @app.errorhandler(404)
