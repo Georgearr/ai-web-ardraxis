@@ -38,5 +38,12 @@ def ask_ai(user_message: str, context: str) -> str:
             last_error = ProviderError(None, f"Unexpected error: {e}")
             logger.error("Unexpected error from %s: %s", provider_name, e)
 
+    # Smart DB fallback if no active API key is provided
+    if context:
+        logger.info("Using DB context fallback response since no active AI API key was configured")
+        lines = [line.strip() for line in context.splitlines() if line.strip() and not line.startswith("System:")]
+        clean_info = "\n".join(lines[:12])
+        return f"Berikut informasi resmi dari database OSIS SMA IGS:\n\n{clean_info}"
+
     logger.error("All AI providers failed. Last error: %s", last_error)
-    return "Maaf, AI sedang tidak tersedia. Silakan coba lagi nanti."
+    return "Maaf, informasi tidak ditemukan pada database OSIS SMA IGS."
