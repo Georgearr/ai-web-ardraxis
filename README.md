@@ -10,12 +10,12 @@ AI Assistant resmi untuk OSIS SMA Ignatius Global School.
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 15, TypeScript, TailwindCSS, shadcn/ui |
-| Backend | Flask, Python |
-| AI | Gemini (google-generativeai) |
+| Application Server | Python 3.11+, Flask (`app.py`) |
+| Frontend Assets | HTML5, CSS3, JavaScript / Next.js Static Export |
+| AI Providers | DeepSeek, OpenRouter, OpenAI, Gemini |
 | Data | Google Sheets (gspread) |
-| Cache | In-memory (cachetools TTLCache, 60s refresh) |
-| Deployment | Linux VPS, Nginx, Gunicorn, systemd |
+| Cache | In-memory (cachetools TTLCache) |
+| Deployment | cPanel (Setup Python App / WSGI / Passenger), Linux VPS (Gunicorn) |
 
 ---
 
@@ -23,100 +23,39 @@ AI Assistant resmi untuk OSIS SMA Ignatius Global School.
 
 ```
 draxis/
-├── frontend/          ← Next.js 15 application
-├── backend/           ← Flask API server
-├── deploy/            ← Nginx, systemd, deployment scripts
-├── scripts/           ← Utility scripts
-└── docs/              ← Documentation
+├── app.py             ← Main Application Entry Point (Flask + Static + API)
+├── passenger_wsgi.py  ← cPanel Phusion Passenger WSGI entry point
+├── wsgi.py            ← Standard WSGI entry point
+├── requirements.txt   ← Python dependencies
+├── backend/           ← Flask API logic & AI services
+├── main-page/         ← Landing page & static web assets
+├── frontend/          ← Next.js source UI
+└── deploy/            ← Deployment scripts & cPanel Setup Guide
 ```
 
 ---
 
-## Setup
+## Setup & Deployment
 
-### Prerequisites
+### 1. Direct Python Host (cPanel / Shared Hosting)
 
-- Python 3.11+
-- Node.js 20+
-- Google Cloud service account with Google Sheets API enabled
-- Gemini API key
+Untuk hosting cPanel berbasis **Setup Python App**:
+- **Application Startup File**: `app.py`
+- **Application Entry Point**: `app` (atau `application`)
 
-### 1. Clone and Configure
+Panduan lengkap cPanel tersedia di: [cpanel_setup_guide.md](file:///e:/WEBSITE%20OSIS%20SMA%20IGS/ai-web-ardraxis/deploy/cpanel_setup_guide.md)
 
-```bash
-git clone <repo-url> draxis
-cd draxis
-```
-
-### 2. Backend Setup
+### 2. Local Run (Development)
 
 ```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
+# Install dependencies
 pip install -r requirements.txt
-```
 
-Copy `.env.example` to `.env` and fill in your credentials:
-
-```bash
-cp .env.example .env
-```
-
-Required environment variables:
-
-| Variable | Description |
-|---|---|
-| `GEMINI_API_KEY` | Your Google Gemini API key |
-| `GOOGLE_SHEET_ID` | Google Sheets ID (from sheet URL) |
-| `GOOGLE_SERVICE_ACCOUNT_JSON` | Full JSON of the service account key |
-| `FRONTEND_URL` | Frontend origin for CORS (default: `http://localhost:3000`) |
-
-### 3. Frontend Setup
-
-```bash
-cd frontend
-npm install
-```
-
-Copy `.env.local.example` to `.env.local`:
-
-```bash
-cp .env.local.example .env.local
-```
-
-### 4. Initialize Google Sheets
-
-```bash
-cd backend
-source .venv/bin/activate
-python ../scripts/seed_sheets.py
-```
-
-This creates the **Members** and **Events** worksheets with proper headers.
-
----
-
-## Run (Development)
-
-### Backend
-
-```bash
-cd backend
-source .venv/bin/activate
+# Run main python application
 python app.py
 ```
 
-Server starts at `http://localhost:5000`.
-
-### Frontend
-
-```bash
-cd frontend
-npm run dev
-```
-
-App starts at `http://localhost:3000`.
+Server berjalan di `http://localhost:5001`.
 
 ---
 
@@ -127,26 +66,6 @@ App starts at `http://localhost:3000`.
 | `GET` | `/api/v1/health` | Service health check |
 | `GET` | `/api/v1/suggestions` | Quick prompt suggestions |
 | `POST` | `/api/v1/chat` | Ask a question (body: `{"message": "..."}`) |
-
----
-
-## Build (Production)
-
-### Backend
-
-```bash
-cd backend
-source .venv/bin/activate
-gunicorn -w 4 -k gevent -b 0.0.0.0:5000 wsgi:app
-```
-
-### Frontend
-
-```bash
-cd frontend
-npm run build
-npm start
-```
 
 ---
 
