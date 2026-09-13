@@ -60,7 +60,7 @@ def create_app() -> Flask:
                 return send_from_directory(str(candidate.parent), candidate.name)
         return None
 
-    # Route: Chatbot AI D'RAX Interface (Default on / and /chat)
+    # Route: Halaman utama drax.osissmaigs.com langsung membuka Interface Chatbot D'RAX
     @app.route("/")
     @app.route("/chat")
     @app.route("/coming_soon")
@@ -73,13 +73,23 @@ def create_app() -> Flask:
             return resp
         return "<h1>D'RAX Chat Assistant</h1>", 200
 
-    # Route: Landing Page OSIS (on /home)
+    # Route: Halaman Utama OSIS (diakses via /home)
     @app.route("/home")
     def serve_home():
         resp = _send_file("index.html")
         if resp:
             return resp
         return serve_chat()
+
+    # Serve Image folder assets (from root img/ or main-page/img/)
+    @app.route("/img/<path:filename>")
+    @app.route("/static/img/<path:filename>")
+    def serve_img(filename):
+        if (ROOT_DIR / "img" / filename).exists():
+            return send_from_directory(str(ROOT_DIR / "img"), filename)
+        if (MAIN_PAGE_DIR / "img" / filename).exists():
+            return send_from_directory(str(MAIN_PAGE_DIR / "img"), filename)
+        return {"error": "Image not found"}, 404
 
     # Serve JS folder
     @app.route("/js/<path:filename>")
