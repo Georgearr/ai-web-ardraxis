@@ -49,35 +49,43 @@ def create_app() -> Flask:
     app.register_blueprint(chat_bp, url_prefix="/api", name="chat_api")
     app.register_blueprint(suggestions_bp, url_prefix="/api", name="suggestions_api")
 
-    def _send_page(page_name="index.html"):
-        if (MAIN_PAGE_DIR / page_name).exists():
-            return send_from_directory(str(MAIN_PAGE_DIR), page_name)
-        if (FRONTEND_OUT_DIR / page_name).exists():
-            return send_from_directory(str(FRONTEND_OUT_DIR), page_name)
-        if (ROOT_DIR / page_name).exists():
-            return send_from_directory(str(ROOT_DIR), page_name)
-        return {"error": "Index page not found"}, 404
+    def _find_file(filename):
+        candidates = [
+            MAIN_PAGE_DIR / filename,
+            FRONTEND_OUT_DIR / filename,
+            ROOT_DIR / filename,
+        ]
+        for candidate in candidates:
+            if candidate.exists() and candidate.is_file():
+                return candidate.parent, candidate.name
+        return None, None
 
     # Route: Landing page
     @app.route("/")
     @app.route("/home")
     def serve_home():
-        return _send_page("index.html")
+        dir_path, name = _find_file("index.html")
+        if dir_path and name:
+            return send_from_directory(str(dir_path), name)
+        return "<h1>ARDRAXIS Web App Ready</h1><p>Running on Python Flask.</p>", 200
 
     # Route: D'RAX Chat Interface
     @app.route("/chat")
     @app.route("/coming_soon")
     def serve_chat():
-        return _send_page("index.html")
+        dir_path, name = _find_file("index.html")
+        if dir_path and name:
+            return send_from_directory(str(dir_path), name)
+        return "<h1>D'RAX Chat Interface</h1>", 200
 
-    # Serve JS folder from main-page
+    # Serve JS folder
     @app.route("/js/<path:filename>")
     def serve_js(filename):
         if (MAIN_PAGE_DIR / "js" / filename).exists():
             return send_from_directory(str(MAIN_PAGE_DIR / "js"), filename)
         if (FRONTEND_OUT_DIR / "js" / filename).exists():
             return send_from_directory(str(FRONTEND_OUT_DIR / "js"), filename)
-        return {"error": "Not found"}, 404
+        return {"error": "JS file not found"}, 404
 
     # Serve static assets
     @app.route("/static/<path:filename>")
@@ -86,24 +94,21 @@ def create_app() -> Flask:
             return send_from_directory(str(MAIN_PAGE_DIR), filename)
         if (FRONTEND_OUT_DIR / filename).exists():
             return send_from_directory(str(FRONTEND_OUT_DIR), filename)
-        return {"error": "Not found"}, 404
+        return {"error": "Static file not found"}, 404
 
-    # Catch-all for root files (CSS, HTML, images, Next.js static files)
+    # Catch-all for root files (CSS, images, HTML)
     @app.route("/<path:filename>")
     def serve_root_files(filename):
         if filename.startswith("api/"):
-            return {"error": "Not found"}, 404
-        if (MAIN_PAGE_DIR / filename).exists():
-            return send_from_directory(str(MAIN_PAGE_DIR), filename)
-        if (FRONTEND_OUT_DIR / filename).exists():
-            return send_from_directory(str(FRONTEND_OUT_DIR), filename)
-        if (ROOT_DIR / filename).exists():
-            return send_from_directory(str(ROOT_DIR), filename)
-        return {"error": "Not found"}, 404
+            return {"error": "API route not found"}, 404
+        dir_path, name = _find_file(filename)
+        if dir_path and name:
+            return send_from_directory(str(dir_path), name)
+        return {"error": f"File {filename} not found"}, 404
 
     @app.errorhandler(404)
     def not_found(_e):
-        return {"error": "Not found"}, 404
+        return {"error": "Page or endpoint not found"}, 404
 
     @app.errorhandler(405)
     def method_not_allowed(_e):
