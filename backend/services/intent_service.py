@@ -80,10 +80,18 @@ def _detect_entity_mention(message: str,
             return "instagram"
 
     # 4) Position – all significant words present
+    has_wakil_in_msg = "wakil" in msg
+    roman_numerals = {"i", "ii", "iii", "iv", "v", "vi", "1", "2", "3", "4", "5"}
     for m in member_models:
         if m.jabatan:
+            j_lower = m.jabatan.lower()
+            has_wakil_in_jabatan = "wakil" in j_lower
+            if has_wakil_in_msg and not has_wakil_in_jabatan:
+                continue
+            if not has_wakil_in_msg and has_wakil_in_jabatan:
+                continue
             significant = [w.lower() for w in m.jabatan.split()
-                           if len(w) > 1 and not w.isnumeric()]
+                           if len(w) > 1 and not w.isnumeric() and w.lower() not in roman_numerals]
             if significant and all(w in msg for w in significant):
                 logger.info("POSITION MATCH: \"%s\" in \"%s\" → %s",
                             m.jabatan, message, m.nama_lengkap)
@@ -473,9 +481,16 @@ def _process_faq(
     logger.info("Tokens   : %s", sorted(query_tokens) if query_tokens else "(empty)")
 
     scored: list[tuple[int, FAQ]] = []
+    has_wakil_in_msg = "wakil" in msg
     if query_tokens:
         for faq in faq_models:
             if not faq.pertanyaan:
+                continue
+            faq_lower = faq.pertanyaan.lower()
+            has_wakil_in_faq = "wakil" in faq_lower
+            if has_wakil_in_msg and not has_wakil_in_faq:
+                continue
+            if not has_wakil_in_msg and has_wakil_in_faq:
                 continue
             faq_tokens = _tokenize(faq.pertanyaan)
             overlap = len(query_tokens & faq_tokens)
@@ -569,12 +584,20 @@ def _process_member_search(
                          len(sekbid_candidates))
 
     # --- PRIORITY 3: Position / Jabatan (broadest) ---
+    has_wakil_in_msg = "wakil" in msg
+    roman_numerals = {"i", "ii", "iii", "iv", "v", "vi", "1", "2", "3", "4", "5"}
     scored = []
     for m in member_models:
         if m.jabatan:
+            j_lower = m.jabatan.lower()
+            has_wakil_in_jabatan = "wakil" in j_lower
+            if has_wakil_in_msg and not has_wakil_in_jabatan:
+                continue
+            if not has_wakil_in_msg and has_wakil_in_jabatan:
+                continue
             significant = [
                 w.lower() for w in m.jabatan.split()
-                if len(w) > 1 and not w.isnumeric()
+                if len(w) > 1 and not w.isnumeric() and w.lower() not in roman_numerals
             ]
             if significant and all(w in msg for w in significant):
                 scored.append((len(m.jabatan), m, "jabatan"))
@@ -767,7 +790,8 @@ def _short_member_lines(m: Member) -> str:
     line = f"- {m.nama_lengkap} ({m.nama_panggilan}) - {position}"
     extras = []
     if m.instagram:
-        insta_line = f"  Instagram: @{m.instagram}"
+        clean_insta = m.instagram.lstrip('@')
+        insta_line = f"  Instagram: @{clean_insta}"
         if emoji:
             insta_line += f" {emoji}"
         extras.append(insta_line)

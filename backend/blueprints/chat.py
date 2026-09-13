@@ -63,24 +63,30 @@ def _log_final_context(context: str):
 
 _FOLLOWUP_PATTERNS = [
     r"\binstagram(nya)?\b",
-    r"\big\b",
-    r"\bjabatannya?\b",
+    r"\big(nya)?\b",
+    r"\bjabatannya\b",
+    r"\bapa\s+jabatannya\b",
     r"\bsekbidnya\b",
     r"\bsub\s*sekbid(nya)?\b",
-    r"\bketua\s*pelaksana(nya)?\b",
-    r"\bwakil(nya)?\b",
-    r"\btanggal(nya)?\b",
-    r"\blokasi(nya)?\b",
-    r"\bdeskripsi(nya)?\b",
-    r"\bdivisi(nya)?\b",
+    r"\bketua\s*pelaksananya\b",
+    r"\bsiapa\s+ketua\s*pelaksananya\b",
+    r"\bwakilnya\b",
+    r"\bsiapa\s+wakilnya\b",
+    r"\btanggalnya\b",
+    r"\bkapan\s+tanggalnya\b",
+    r"\blokasinya\b",
+    r"\bdi\s*mana\s+lokasinya\b",
+    r"\bdeskripsinya\b",
+    r"\bdivisinya\b",
     r"\bdetail(nya)?\b",
     r"\bketuanya\b",
+    r"\bsiapa\s+ketuanya\b",
     r"\bliat\s*instagram",
     r"\bceritain\b",
     r"\binfo\s*lebih\b",
     r"\blebih\s*detail\b",
-    r"\bwa\b",
-    r"\bwhatsapp\b",
+    r"\bwa(nya)?\b",
+    r"\bwhatsapp(nya)?\b",
     r"\btelpon(nya)?\b",
     r"\bnomor(nya)?\b",
 ]
@@ -160,56 +166,71 @@ def chat():
         logger.info("Processing message: %.100s", message)
         session_id = _get_session_id()
 
-        # -----------------------------------------------------------------------
-        # FOLLOW-UP PATH – reuse last_sekbid if user asks about members generically
-        # -----------------------------------------------------------------------
-        if _is_member_followup(message) and not is_special_faq_query(message) and not has_sekbid_mention(message) and not find_sekbids(message):
-            last_sekbid = session_store.get_last_sekbid(session_id)
-            if last_sekbid:
-                logger.info("[SESSION] Using previous sekbid context: %s", last_sekbid)
-                member_models = csv_store.get_members()
-                event_models = csv_store.get_events()
-                faq_models = csv_store.get_faqs()
-                program_models = csv_store.get_programs()
-                result = process_intent(
-                    Intent.MEMBER_SEARCH, message,
-                    member_models, event_models, faq_models, program_models,
-                    matched_sekbids=[last_sekbid],
-                )
-                context = build_intent_context(result)
-                if context:
-                    _log_member_retrieval(message, result)
-                    _log_final_context(context)
-                    _log_prompt_metrics(context, message)
-                    _save_session(session_id, result, context, matched_sekbids=[last_sekbid])
-                    response = ask_ai(message, context)
-                    return jsonify({"response": response}), 200
-
-        # -----------------------------------------------------------------------
-        # NORMAL FOLLOW-UP (Instagram, detail, etc.) – reuse stored context
-        # -----------------------------------------------------------------------
-        if _is_followup(message):
-            stored_context = session_store.get_last_context(session_id)
-            if stored_context is not None:
-                logger.info("[SESSION] Follow-up detected, using stored context")
-                _log_final_context(stored_context)
-                _log_prompt_metrics(stored_context, message)
-                response = ask_ai(message, stored_context)
-                logger.info(
-                    "Response generated (len=%d, session_reuse=True)",
-                    len(response),
-                )
-                return jsonify({"response": response}), 200
-
-        # -----------------------------------------------------------------------
-        # FRESH QUERY PATH
-        # -----------------------------------------------------------------------
+        # Load data stores once
         member_models = csv_store.get_members()
         event_models = csv_store.get_events()
         faq_models = csv_store.get_faqs()
         program_models = csv_store.get_programs()
-
         matched_sekbids = find_sekbids(message)
+
+        # Check if the query is a fresh query with its own explicit entity/topic
+        entity_type = _detect_entity_mention(message, member_models)
+        has_direct_faq = bool(process_intent(
+            Intent.FAQ, message,
+            member_models, event_models, faq_models, program_models,
+            matched_sekbids,
+        ).get("matched"))
+        has_event_match = any(e.nama_event and e.nama_event.lower() in message.lower() for e in event_models)
+        is_fresh_query = bool(
+            has_direct_faq
+            or is_special_faq_query(message)
+            or entity_type
+            or matched_sekbids
+            or has_sekbid_mention(message)
+            or has_event_match
+        )
+
+        if not is_fresh_query:
+            # -----------------------------------------------------------------------
+            # FOLLOW-UP PATH – reuse last_sekbid if user asks about members generically
+            # -----------------------------------------------------------------------
+            if _is_member_followup(message):
+                last_sekbid = session_store.get_last_sekbid(session_id)
+                if last_sekbid:
+                    logger.info("[SESSION] Using previous sekbid context: %s", last_sekbid)
+                    result = process_intent(
+                        Intent.MEMBER_SEARCH, message,
+                        member_models, event_models, faq_models, program_models,
+                        matched_sekbids=[last_sekbid],
+                    )
+                    context = build_intent_context(result)
+                    if context:
+                        _log_member_retrieval(message, result)
+                        _log_final_context(context)
+                        _log_prompt_metrics(context, message)
+                        _save_session(session_id, result, context, matched_sekbids=[last_sekbid])
+                        response = ask_ai(message, context)
+                        return jsonify({"response": response}), 200
+
+            # -----------------------------------------------------------------------
+            # NORMAL FOLLOW-UP (Instagram, detail, etc.) – reuse stored context
+            # -----------------------------------------------------------------------
+            if _is_followup(message):
+                stored_context = session_store.get_last_context(session_id)
+                if stored_context is not None:
+                    logger.info("[SESSION] Follow-up detected, using stored context")
+                    _log_final_context(stored_context)
+                    _log_prompt_metrics(stored_context, message)
+                    response = ask_ai(message, stored_context)
+                    logger.info(
+                        "Response generated (len=%d, session_reuse=True)",
+                        len(response),
+                    )
+                    return jsonify({"response": response}), 200
+
+        # -----------------------------------------------------------------------
+        # FRESH QUERY PATH
+        # -----------------------------------------------------------------------
 
         # --- FAQ-FIRST CASCADE (highest priority) ---
         faq_result = process_intent(
